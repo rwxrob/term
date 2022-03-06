@@ -1,6 +1,6 @@
 // Copyright 2022 Robert S. Muhlestein
 // SPDX-License-Identifier: Apache-2.0
-  
+
 /*
 Package esc contains commonly used VT100 ANSI terminal escape sequences
 for different attributes and terminal control. These are meant to be
