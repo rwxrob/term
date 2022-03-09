@@ -110,4 +110,7 @@ const (
 	BHMagenta = "\033[105m"
 	BHCyan    = "\033[106m"
 	BHWhite   = "\033[107m"
+
+	HideCursor = "\033[?25l"
+	ShowCursor = "\033[?25h"
 )

@@ -4,6 +4,8 @@
 package term
 
 import (
+	"bufio"
+	"fmt"
 	"os"
 
 	"github.com/rwxrob/term/esc"
@@ -199,4 +201,25 @@ func AttrOn() {
 	I = esc.Italic
 	U = esc.Under
 	BI = esc.BoldItalic
+}
+
+// EchoOff disables the display of typed characters on VT100 compatible
+// terminals.
+func EchoOff() { fmt.Print(esc.Hidden + esc.HideCursor) }
+
+// Read reads a single line of input and chomps the \r?\n. Also see
+// ReadHidden.
+func Read() string {
+	scanner := bufio.NewScanner(os.Stdin)
+	scanner.Scan()
+	return scanner.Text()
+}
+
+// ReadHidden disables echo hiding what is typed (on VT100 compatible
+// terminals) and reads the input and chomps the \r?\n and then restores
+// echo to the terminal. Also see Read.
+func ReadHidden() string {
+	EchoOff()
+	defer func() { fmt.Print(esc.Reset + esc.ShowCursor) }()
+	return Read()
 }
