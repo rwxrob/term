@@ -5,10 +5,12 @@ package term
 
 import (
 	"bufio"
-	"fmt"
+	"log"
 	"os"
+	"strings"
 
 	"github.com/rwxrob/term/esc"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 var (
@@ -203,10 +205,6 @@ func AttrOn() {
 	BI = esc.BoldItalic
 }
 
-// EchoOff disables the display of typed characters on VT100 compatible
-// terminals.
-func EchoOff() { fmt.Print(esc.Hidden + esc.HideCursor) }
-
 // Read reads a single line of input and chomps the \r?\n. Also see
 // ReadHidden.
 func Read() string {
@@ -215,11 +213,13 @@ func Read() string {
 	return scanner.Text()
 }
 
-// ReadHidden disables echo hiding what is typed (on VT100 compatible
-// terminals) and reads the input and chomps the \r?\n and then restores
-// echo to the terminal. Also see Read.
+// ReadHidden disables the cursor and echoing to the screen and reads
+// a single line of input. Leading and trailing whitespace are removed.
+// Also see Read.
 func ReadHidden() string {
-	EchoOff()
-	defer func() { fmt.Print(esc.Reset + esc.ShowCursor) }()
-	return Read()
+	byt, err := terminal.ReadPassword(0)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return strings.TrimSpace(string(byt))
 }
