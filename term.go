@@ -5,6 +5,7 @@ package term
 
 import (
 	"bufio"
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -222,4 +223,23 @@ func ReadHidden() string {
 		log.Fatal(err)
 	}
 	return strings.TrimSpace(string(byt))
+}
+
+// Prompt prints the given message if the terminal IsInteractive and
+// reads the string by calling Read.
+func Prompt(msg string) string {
+	if IsInteractive() {
+		fmt.Print(msg)
+	}
+	return Read()
+}
+
+// PromptHidden prints the given message if the terminal IsInteractive and
+// reads the string by calling ReadHidden (which does not echo to the
+// screen).
+func PromptHidden(msg string) string {
+	if IsInteractive() {
+		fmt.Print(msg)
+	}
+	return ReadHidden()
 }
