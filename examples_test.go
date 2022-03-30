@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/rwxrob/term"
+	"github.com/rwxrob/term/esc"
 )
 
 func ExampleRed() {
@@ -18,4 +19,11 @@ func ExampleRed() {
 	// Output:
 	// <red>simply red<reset>
 	// simply red
+}
+
+func ExampleStripNonPrint() {
+	some := esc.Bold + "not bold" + esc.Reset
+	fmt.Println(term.StripNonPrint(some))
+	// Output;
+	// not bold
 }

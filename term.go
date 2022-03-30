@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"unicode"
 
 	"github.com/rwxrob/term/esc"
 	"golang.org/x/crypto/ssh/terminal"
@@ -244,4 +245,17 @@ func PromptHidden(form string, args ...any) string {
 		fmt.Printf(form, args...)
 	}
 	return ReadHidden()
+}
+
+// StripNonPrint remove non-printable runes, e.g. control characters in
+// a string that is meant for consumption by terminals that support
+// control characters.
+func StripNonPrint(s string) string {
+	return strings.Map(
+		func(r rune) rune {
+			if unicode.IsPrint(r) {
+				return r
+			}
+			return -1
+		}, s)
 }
