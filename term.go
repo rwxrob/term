@@ -259,3 +259,28 @@ func StripNonPrint(s string) string {
 			return -1
 		}, s)
 }
+
+// EmphFromLess sets Italic, Bold, BoldItalic, and Under from the
+// LESS_TERMCAP_us, _md, _mb, and _us environment variables
+// respectively. This is a long used way to provide color to UNIX man
+// pages dating back to initial color terminals. UNIX users frequently
+// set these to provide color to man pages and more.
+func EmphFromLess() {
+	var x string
+	x = os.Getenv("LESS_TERMCAP_us")
+	if x != "" {
+		Italic = x
+	}
+	x = os.Getenv("LESS_TERMCAP_md")
+	if x != "" {
+		Bold = x
+	}
+	x = os.Getenv("LESS_TERMCAP_mb")
+	if x != "" {
+		BoldItalic = x
+	}
+	x = os.Getenv("LESS_TERMCAP_us")
+	if x != "" {
+		Under = x
+	}
+}
