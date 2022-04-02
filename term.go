@@ -81,11 +81,33 @@ type WinSizeStruct struct {
 // displaying help and usage information.
 var WinSize WinSizeStruct
 
+// DisableInteractive causes IsInteractive to always return false. This
+// must be set from init() to take affect within this package.
+var DisableInteractive bool
+
+// ForceInteractive causes IsInteractive to always return true. This
+// must be set from init() to take affect within this package.
+var ForceInteractive bool
+
+// AttrAreOn returns true if AttrOn was recently called. Does nothing to
+// prevent direct changes to attributes cleared with AttrOff.  AttrOn is
+// called, setting AttrAreOn to true during init() if IsInteractive, but
+// this can be disabled preferably with AttrOff().
+var AttrAreOn bool
+
 // IsInteractive returns true if the output is to an interactive terminal
 // (not piped in any way). This is useful when determining if an extra
 // line return is needed to avoid making programs chomp the line returns
-// unnecessarily.
+// unnecessarily. Non-interactive mode can be forced during testing by
+// setting term.DisableInteractive to true and interactive mode can be
+// forced on by setting term.ForceInteractive to true
 func IsInteractive() bool {
+	if DisableInteractive {
+		return false
+	}
+	if ForceInteractive {
+		return true
+	}
 	if f, _ := os.Stdout.Stat(); (f.Mode() & os.ModeCharDevice) != 0 {
 		return true
 	}
@@ -100,8 +122,10 @@ func init() {
 
 // AttrOff sets all the terminal attributes to zero values (empty strings).
 // Note that this does not affect anything in the esc subpackage (which
-// contains the constants from the VT100 specification).
+// contains the constants from the VT100 specification). Sets the
+// AttrAreOn bool to false.
 func AttrOff() {
+	AttrAreOn = false
 	Reset = ""
 	Bright = ""
 	Bold = ""
@@ -155,8 +179,10 @@ func AttrOff() {
 
 // AttrOn sets all the terminal attributes to zero values (empty strings).
 // Note that this does not affect anything in the esc subpackage (which
-// contains the constants from the VT100 specification).
+// contains the constants from the VT100 specification). Sets the
+// AttrAreOn bool to true.
 func AttrOn() {
+	AttrAreOn = true
 	Reset = esc.Reset
 	Bright = esc.Bright
 	Bold = esc.Bold
@@ -264,8 +290,12 @@ func StripNonPrint(s string) string {
 // LESS_TERMCAP_us, _md, _mb, and _us environment variables
 // respectively. This is a long used way to provide color to UNIX man
 // pages dating back to initial color terminals. UNIX users frequently
-// set these to provide color to man pages and more.
+// set these to provide color to man pages and more. Observes AttrAreOn
+// and will simply return if set to false.
 func EmphFromLess() {
+	if !AttrAreOn {
+		return
+	}
 	var x string
 	x = os.Getenv("LESS_TERMCAP_us")
 	if x != "" {
