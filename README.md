@@ -9,4 +9,6 @@ Card](https://goreportcard.com/badge/github.com/rwxrob/term)](https://goreportca
 
 * [VT100 Terminal ANSI Escapes](esc)
 * [Terminal Size](winsize.go)
-* [IsInteractive](examples_test.go)
+* [AttrOn/AttrOff](examples_test.go)
+* [IsInteractive/SetInteractive](term.go)
+* [EmphFromLess](examples_test.go)

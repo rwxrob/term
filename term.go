@@ -81,44 +81,37 @@ type WinSizeStruct struct {
 // displaying help and usage information.
 var WinSize WinSizeStruct
 
-// DisableInteractive causes IsInteractive to always return false. This
-// must be set from init() to take affect within this package.
-var DisableInteractive bool
+var interactive bool
 
-// ForceInteractive causes IsInteractive to always return true. This
-// must be set from init() to take affect within this package.
-var ForceInteractive bool
+func init() { SetInteractive(DetectInteractive()) }
 
-// AttrAreOn returns true if AttrOn was recently called. Does nothing to
-// prevent direct changes to attributes cleared with AttrOff.  AttrOn is
-// called, setting AttrAreOn to true during init() if IsInteractive, but
-// this can be disabled preferably with AttrOff().
-var AttrAreOn bool
-
-// IsInteractive returns true if the output is to an interactive terminal
-// (not piped in any way). This is useful when determining if an extra
-// line return is needed to avoid making programs chomp the line returns
-// unnecessarily. Non-interactive mode can be forced during testing by
-// setting term.DisableInteractive to true and interactive mode can be
-// forced on by setting term.ForceInteractive to true
-func IsInteractive() bool {
-	if DisableInteractive {
-		return false
+// SetInteractive forces the interactive internal state affecting output
+// including calling AttrOn (true) or AttrOff (false).
+func SetInteractive(to bool) {
+	interactive = to
+	if to {
+		AttrOn()
+	} else {
+		AttrOff()
 	}
-	if ForceInteractive {
-		return true
-	}
+}
+
+// IsInteractive returns the internal interactive state set by
+// SetInteractive. The default is that returned by DetectInteractive set
+// at  init() time.
+func IsInteractive() bool { return interactive }
+
+// DetectInteractive returns true if the output is to an interactive
+// terminal (not piped in any way).
+func DetectInteractive() bool {
 	if f, _ := os.Stdout.Stat(); (f.Mode() & os.ModeCharDevice) != 0 {
 		return true
 	}
 	return false
 }
 
-func init() {
-	if IsInteractive() {
-		AttrOn()
-	}
-}
+// AttrAreOn contains the state of the last AttrOn/AttrOff call.
+var AttrAreOn bool
 
 // AttrOff sets all the terminal attributes to zero values (empty strings).
 // Note that this does not affect anything in the esc subpackage (which

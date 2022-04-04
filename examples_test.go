@@ -15,6 +15,7 @@ func ExampleRed() {
 	term.Red = "<red>"
 	term.Reset = "<reset>"
 	fmt.Println(term.Red + "simply red" + term.Reset)
+	defer term.AttrOn()
 	term.AttrOff()
 	fmt.Println(term.Red + "simply red" + term.Reset)
 	// Output:
@@ -57,9 +58,9 @@ func ExampleEmphFromLess() {
 	fmt.Printf("%q\n", term.Under+"under"+term.Reset)
 
 	// Output:
-	// "\x1b[4mitalic"
-	// "\x1b[33mbold"
-	// "\x1b[35mbolditalic"
-	// "\x1b[4munder"
+	// "\x1b[4mitalic\x1b[0m"
+	// "\x1b[33mbold\x1b[0m"
+	// "\x1b[35mbolditalic\x1b[0m"
+	// "\x1b[4munder\x1b[0m"
 
 }
