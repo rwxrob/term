@@ -83,7 +83,10 @@ var WinSize WinSizeStruct
 
 var interactive bool
 
-func init() { SetInteractive(DetectInteractive()) }
+func init() {
+	EmphFromLess()
+	SetInteractive(DetectInteractive())
+}
 
 // SetInteractive forces the interactive internal state affecting output
 // including calling AttrOn (true) or AttrOff (false).
@@ -284,7 +287,8 @@ func StripNonPrint(s string) string {
 // respectively. This is a long used way to provide color to UNIX man
 // pages dating back to initial color terminals. UNIX users frequently
 // set these to provide color to man pages and more. Observes AttrAreOn
-// and will simply return if set to false.
+// and will simply return if set to false. EmphFromLess is called at
+// package init() time automatically.
 func EmphFromLess() {
 	if !AttrAreOn {
 		return
