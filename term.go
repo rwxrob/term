@@ -261,7 +261,7 @@ type InOutFunc func(in string) string
 
 // REPL starts a rudimentary, functional, read-evaluate print loop
 // passing each line of prompted input to the respond function as it is
-// entered, printing the response with a line return, and then prompting
+// entered, printing the response, and then prompting
 // for another. No tab-completion is supported or planned. In this way,
 // a REPL can be used to connect prompt and respond functions by passing
 // input/output back and forth.
@@ -290,7 +290,7 @@ func REPL(prompt, respond InOutFunc) {
 		p := prompt(input)
 		fmt.Print(p)
 		input = Read() // should block
-		fmt.Println(respond(input))
+		fmt.Print(respond(input))
 	}
 }
 
