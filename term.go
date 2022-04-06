@@ -1,6 +1,11 @@
 // Copyright 2022 Robert S. Muhlestein
 // SPDX-License-Identifier: Apache-2.0
 
+/*
+Package term provides traditional terminal escapes and interactions
+including an Prompter/Responder specification for Expect-like,
+line-based APIs, communications, and user interfaces.
+*/
 package term
 
 import (
@@ -240,6 +245,55 @@ func Read() string {
 	return scanner.Text()
 }
 
+// TrapPanic recovers from any panic and more gracefully displays the
+// panic by logging it before exiting. See log package for ways to alter
+// the output of the embedded log.Println function.
+var TrapPanic = func() {
+	if r := recover(); r != nil {
+		log.Println(r)
+		os.Exit(1)
+	}
+}
+
+// InOutFunc is a function that takes input as a string and simply
+// responds based on that input.
+type InOutFunc func(in string) string
+
+// REPL starts a rudimentary, functional, read-evaluate print loop
+// passing each line of prompted input to the respond function as it is
+// entered, printing the response with a line return, and then prompting
+// for another. No tab-completion is supported or planned. In this way,
+// a REPL can be used to connect prompt and respond functions by passing
+// input/output back and forth.
+//
+// The output from the prompt function will be printed directly to the
+// terminal before prompting for more input. Most prompt function
+// implementations will print a preceding line return.  Prompt function
+// implementations must state explicitly any terminal requirements
+// (plain text, markup, VT100 compatible, etc.)
+//
+// Response functions can be useful for encapsulating bots and other
+// intelligent responders to any terminal input. In theory, one respond
+// function can be connected to another. In that sense, respond
+// functions are a rudimentary, single-line replacement for other API
+// interactions (such as rest).
+//
+// Either prompt or respond functions may use panic or os.Exit to end
+// the program, but panic is generally preferred since the REPL (or
+// other caller) can trap it and exit gracefully. Panics within a REPL
+// are generally sent directly to the user and therefore may break the
+// all-lowercase convention normally observed for panic messages.
+func REPL(prompt, respond InOutFunc) {
+	defer TrapPanic()
+	var input string
+	for {
+		p := prompt(input)
+		fmt.Print(p)
+		input = Read() // should block
+		fmt.Println(respond(input))
+	}
+}
+
 // ReadHidden disables the cursor and echoing to the screen and reads
 // a single line of input. Leading and trailing whitespace are removed.
 // Also see Read.
@@ -253,7 +307,7 @@ func ReadHidden() string {
 
 // Prompt prints the given message if the terminal IsInteractive and
 // reads the string by calling Read. The argument signature is identical
-// and passed to to fmt.Printf().
+// as that passed to fmt.Printf().
 func Prompt(form string, args ...any) string {
 	if IsInteractive() {
 		fmt.Printf(form, args...)

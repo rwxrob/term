@@ -14,4 +14,26 @@ func main() {
 	p = term.ReadHidden()
 	fmt.Println()
 	fmt.Println("You entered while hidden: ", p)
+
+	defer term.TrapPanic()
+
+	// both are enclosed in prompt/respond functions
+	var history []string
+	hcount := 1
+
+	prompt := func(_ string) string {
+		if hcount > 3 {
+			panic("All done.")
+		}
+		return fmt.Sprintf("%v> ", hcount)
+	}
+
+	respond := func(in string) string {
+		hcount++
+		history = append(history, in)
+		return "okay"
+	}
+
+	term.REPL(prompt, respond)
+
 }

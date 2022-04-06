@@ -64,3 +64,26 @@ func ExampleEmphFromLess() {
 	// "\x1b[4munder\x1b[0m"
 
 }
+
+func ExampleREPL() {
+	defer term.TrapPanic()
+
+	// both are enclosed in prompt/respond functions
+	var history []string
+	hcount := 1
+
+	prompt := func(_ string) string {
+		if hcount > 3 {
+			panic("All done.")
+		}
+		return fmt.Sprintf("%v> ", hcount)
+	}
+
+	respond := func(in string) string {
+		hcount++
+		history = append(history, in)
+		return "okay"
+	}
+
+	term.REPL(prompt, respond)
+}
