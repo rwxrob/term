@@ -84,8 +84,9 @@ var WinSize WinSizeStruct
 var interactive bool
 
 func init() {
-	EmphFromLess()
 	SetInteractive(DetectInteractive())
+	EmphFromLess()
+	WinSizeUpdate()
 }
 
 // SetInteractive forces the interactive internal state affecting output
@@ -113,15 +114,17 @@ func DetectInteractive() bool {
 	return false
 }
 
-// AttrAreOn contains the state of the last AttrOn/AttrOff call.
-var AttrAreOn bool
+var attron bool
+
+// IsAttrOn contains the state of the last AttrOn/AttrOff call.
+func IsAttrOn() bool { return attron }
 
 // AttrOff sets all the terminal attributes to zero values (empty strings).
 // Note that this does not affect anything in the esc subpackage (which
 // contains the constants from the VT100 specification). Sets the
 // AttrAreOn bool to false.
 func AttrOff() {
-	AttrAreOn = false
+	attron = false
 	Reset = ""
 	Bright = ""
 	Bold = ""
@@ -178,7 +181,7 @@ func AttrOff() {
 // contains the constants from the VT100 specification). Sets the
 // AttrAreOn bool to true.
 func AttrOn() {
-	AttrAreOn = true
+	attron = true
 	Reset = esc.Reset
 	Bright = esc.Bright
 	Bold = esc.Bold
@@ -290,7 +293,7 @@ func StripNonPrint(s string) string {
 // and will simply return if set to false. EmphFromLess is called at
 // package init() time automatically.
 func EmphFromLess() {
-	if !AttrAreOn {
+	if !attron {
 		return
 	}
 	var x string
