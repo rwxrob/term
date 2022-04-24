@@ -237,6 +237,25 @@ func AttrOn() {
 	BI = esc.BoldItalic
 }
 
+// Print calls Println if IsInteractive, otherwise, Print. This works
+// better with applications that would otherwise need to trim the
+// tailing line return to set that as values for shell variables.
+func Print(a ...any) (int, error) {
+	if IsInteractive() {
+		return fmt.Println(a...)
+	}
+	return fmt.Print(a...)
+}
+
+// Printf calls fmt.Printf directly but adds a line return if
+// IsInteractive.
+func Printf(format string, a ...any) (int, error) {
+	if IsInteractive() {
+		format += "\n"
+	}
+	return fmt.Printf(format, a...)
+}
+
 // Read reads a single line of input and chomps the \r?\n. Also see
 // ReadHidden.
 func Read() string {
