@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+  "syscall"
 	"strings"
 	"unicode"
 
@@ -317,7 +318,7 @@ func REPL(prompt, respond InOutFunc) {
 // a single line of input. Leading and trailing whitespace are removed.
 // Also see Read.
 func ReadHidden() string {
-	byt, err := terminal.ReadPassword(0)
+	byt, err := terminal.ReadPassword(int(syscall.Stdin))
 	if err != nil {
 		log.Fatal(err)
 	}
